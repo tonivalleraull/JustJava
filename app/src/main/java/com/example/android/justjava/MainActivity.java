@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.google.android.gms.appindexing.Action;
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     //Global variables
     int quantity = 0;
     int priceOfCoffee = 5;
+
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -43,7 +45,9 @@ public class MainActivity extends AppCompatActivity {
      * This method is called when the order button is clicked.
      */
     public void submitOrder(View view) {
-        displayMessage(calculateOrder(calculatePrice()));
+        boolean hasWhippedCream = ((CheckBox) findViewById(R.id.whippedcream_checkbox)).isChecked();
+        String orderMessage = calculateOrder(calculatePrice(), hasWhippedCream);
+        displayMessage(orderMessage);
     }
 
     /**
@@ -56,13 +60,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * This method forms a message with order summary
+     * This method forms a message with order summary.
      *
      * @param price this is the price of the order
      * @return summary of the order
      */
-    public String calculateOrder(int price) {
+    public String calculateOrder(int price, boolean addWhippedCream) {
         String message = "Name: Captain Toni\n";
+        message += "Add whiped cream? " + addWhippedCream + "\n";
         message += "Quantity: " + quantity + "\n";
         message += "Total: " + price + "€\n";
         message += "Thank you!";
