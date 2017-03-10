@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.android.gms.appindexing.Action;
@@ -25,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
     //Global variables
     int quantity = 0;
     int priceOfCoffee = 5;
+    int priceOfWhippedCream = 1;
+    int priceOfChocolate = 2;
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -46,28 +49,46 @@ public class MainActivity extends AppCompatActivity {
      */
     public void submitOrder(View view) {
         boolean hasWhippedCream = ((CheckBox) findViewById(R.id.whippedcream_checkbox)).isChecked();
-        String orderMessage = calculateOrder(calculatePrice(), hasWhippedCream);
+        boolean hasChocolate = ((CheckBox) findViewById(R.id.chocolate_checkbox)).isChecked();
+        String customerName = ((EditText) findViewById(R.id.customerName)).getText().toString();
+        String orderMessage = calculateOrder(calculatePrice(hasWhippedCream, hasChocolate), hasWhippedCream, hasChocolate, customerName);
         displayMessage(orderMessage);
     }
 
     /**
      * This method calculates the price of the order.
-     *
+     * @param addWhippedCream to check if the user wants whipped cream
+     * @param addChocolate to check if the user wants chocolate
      * @return total price
      */
-    public int calculatePrice() {
-        return quantity * priceOfCoffee;
+    public int calculatePrice(boolean addWhippedCream, boolean addChocolate) {
+        int finalPriceOfCoffe = priceOfCoffee;
+
+        //If the user wants cream we add the price of the whipped cream topping
+        if(addWhippedCream){
+            finalPriceOfCoffe += priceOfWhippedCream;
+        }
+        //If the user wants chocolate we add the price of the chocolate topping
+        if(addChocolate){
+            finalPriceOfCoffe += priceOfChocolate;
+        }
+
+        return finalPriceOfCoffe * quantity;
     }
 
     /**
-     * This method forms a message with order summary.
+     * Create summary of the order.
      *
-     * @param price this is the price of the order
-     * @return summary of the order
+     * @param addWhippedCream is whether or not the user wants whipped cream topping
+     * @param addChocolate is whether or not the user wants whipped cream topping
+     * @param customerName is the name of the customer for the Order
+     * @param price of the order
+     * @return text summary
      */
-    public String calculateOrder(int price, boolean addWhippedCream) {
-        String message = "Name: Captain Toni\n";
+    public String calculateOrder(int price, boolean addWhippedCream, boolean addChocolate, String customerName) {
+        String message = "Name: " + customerName + "\n";
         message += "Add whiped cream? " + addWhippedCream + "\n";
+        message += "Add chocolate? " + addChocolate + "\n";
         message += "Quantity: " + quantity + "\n";
         message += "Total: " + price + "€\n";
         message += "Thank you!";
