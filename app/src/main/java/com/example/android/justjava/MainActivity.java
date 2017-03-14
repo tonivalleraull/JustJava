@@ -6,6 +6,7 @@
  */
 package com.example.android.justjava;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -24,7 +26,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
  */
 public class MainActivity extends AppCompatActivity {
     //Global variables
-    int quantity = 0;
+    int quantity = 2;
     int priceOfCoffee = 5;
     int priceOfWhippedCream = 1;
     int priceOfChocolate = 2;
@@ -52,7 +54,18 @@ public class MainActivity extends AppCompatActivity {
         boolean hasChocolate = ((CheckBox) findViewById(R.id.chocolate_checkbox)).isChecked();
         String customerName = ((EditText) findViewById(R.id.customerName)).getText().toString();
         String orderMessage = calculateOrder(calculatePrice(hasWhippedCream, hasChocolate), hasWhippedCream, hasChocolate, customerName);
-        displayMessage(orderMessage);
+
+        //Enviamos el order summary por correo
+        String subject = "Just Java app order from " + ((EditText) findViewById(R.id.customerName)).getText().toString();
+        String [] addresses = {"tonivalleraull@gmail.com"};
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("mailto:")); // only email apps should handle this
+        intent.putExtra(Intent.EXTRA_EMAIL, addresses);
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        intent.putExtra(Intent.EXTRA_TEXT, orderMessage);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
     }
 
     /**
@@ -99,16 +112,35 @@ public class MainActivity extends AppCompatActivity {
      * This method is called when the increment button is clicked.
      */
     public void increment(View view) {
-        quantity++;
-        display(quantity);
+
+        //We don't allow to order more than one hundred coffees
+        if (quantity < 100) {
+            quantity++;
+            display(quantity);
+            return;
+        }
+        //We show a toast message informing the user that it's not possible to order more than one hundred coffees
+        else{
+            Toast.makeText(this, "You can't order more than one hundred coffees", Toast.LENGTH_SHORT).show();
+            return;
+        }
     }
 
     /**
      * This method is called when the decrement button is clicked.
      */
     public void decrement(View view) {
-        quantity--;
-        display(quantity);
+        //We don't allow to order less than one coffee
+        if (quantity > 1) {
+            quantity--;
+            display(quantity);
+            return;
+        }
+        //We show a toast message informing the user that it's not possible to order less than 1 coffee
+        else{
+            Toast.makeText(this, "You can't order less than one coffees", Toast.LENGTH_SHORT).show();
+            return;
+        }
     }
 
     /**
@@ -117,14 +149,6 @@ public class MainActivity extends AppCompatActivity {
     private void display(int number) {
         TextView quantityTextView = (TextView) findViewById(R.id.quantity_text_view);
         quantityTextView.setText("" + number);
-    }
-
-    /**
-     * This method displays the given text on the screen.
-     */
-    private void displayMessage(String message) {
-        TextView orderSummaryTextView = (TextView) findViewById(R.id.order_summary_text_view);
-        orderSummaryTextView.setText(message);
     }
 
     /**
